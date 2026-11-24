@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<!--
+  Catlavan Client — landing page (один файл, без зависимостей).
+
+  ПУБЛИКАЦИЯ НА GITHUB PAGES
+  Вариант А (рекомендую — так сделан pulsevisualclient.github.io):
+    1) Создай ПУБЛИЧНЫЙ репозиторий с именем catlavandlc.github.io
+       (ровно <твой-логин>.github.io).
+    2) Загрузи этот файл в КОРЕНЬ репозитория под именем index.html
+       (Add file → Upload files, или git add + commit + push).
+    3) Settings → Pages → Source: «Deploy from a branch» → Branch: main → /(root) → Save.
+    4) Через 1–2 минуты сайт доступен на https://catlavandlc.github.io —
+       чистый адрес без хвостов.
+  Вариант Б: репозиторий с любым именем (например catlavan-site) →
+    адрес будет https://catlavandlc.github.io/catlavan-site/
+  Свой домен (например catlavan.fun): купить на reg.ru/nic.ru, затем
+    Settings → Pages → Custom domain + CNAME-запись в DNS у регистратора.
+    Слово «minecraft» в домен не включай — это товарный знак Mojang.-->
+
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catlavan Client 1.16.5 — бесплатный чит-клиент для Minecraft</title>
+<meta name="description" content="Catlavan Client для Minecraft 1.16.5 — мощный чит-клиент с кастомизацией визуалов, гибким HUD, бустом FPS и огромным набором модулей. Windows, macOS, Linux. Полностью бесплатно.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Catlavan Client 1.16.5">
+<meta property="og:description" content="Бесплатный чит-клиент для Minecraft 1.16.5: 80+ модулей, гибкий HUD, буст FPS. Windows, macOS, Linux.">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --bg:#000000; --bg2:#0a0a0a; --bg3:#000000;
+    --fg:#f4f4f5; --muted:#a1a1aa; --dim:#71717a;
+    --violet:#ffffff; --violet-l:#d4d4d8; --fuchsia:#ffffff;
+    --emerald:#34d399; --red:#f87171; --amber:#fbbf24;
+    --border:rgba(255,255,255,.1); --border-v:rgba(255,255,255,.25);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
+    --mono:"JetBrains Mono",Consolas,"SF Mono",Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.6;overflow-x:hidden}
+  .wrap{max-width:1152px;margin:0 auto;padding:0 16px}
+  @media(min-width:640px){.wrap{padding:0 24px}}
+  svg{display:inline-block;vertical-align:middle}
+
+  /* ---------- header ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:50;transition:all .3s;border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(0,0,0,.9);backdrop-filter:blur(16px);border-bottom-color:var(--border)}
+  .hd{height:64px;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--fg);font-weight:700;font-size:18px;letter-spacing:-.02em}
+  .logo .ic{width:36px;height:36px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+  .logo b{color:var(--violet-l)}
+  nav.desk{display:none;gap:24px}
+  nav.desk a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+  nav.desk a:hover{color:#fff}
+  .hd-dl{display:none}
+  .burger{width:40px;height:40px;border:1px solid var(--border);border-radius:10px;background:none;color:var(--fg);cursor:pointer;display:grid;place-items:center}
+  @media(min-width:768px){nav.desk{display:flex}.hd-dl{display:inline-flex}.burger{display:none}}
+  .mob{display:none;background:rgba(0,0,0,.98);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px 16px}
+  .mob.open{display:block}
+  .mob a{display:block;padding:12px;border-radius:10px;color:#d4d4d8;text-decoration:none}
+  .mob a:hover{background:rgba(255,255,255,.05);color:#fff}
+  .mob .mob-dl{margin-top:8px;padding:12px;border-radius:10px;background:#fff;color:#000;font-weight:600;text-align:center;border:none;width:100%;cursor:pointer;font-size:15px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:var(--font);border-radius:12px;font-weight:600;transition:all .25s;text-decoration:none}
+  .btn-vio{position:relative;overflow:hidden;background:linear-gradient(90deg,var(--violet),var(--fuchsia));color:#000;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+  .btn-vio:hover{filter:brightness(1.12);transform:translateY(-1px)}
+  .btn-vio::after{content:"";position:absolute;top:0;left:-140%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(0,0,0,.14),transparent);transform:skewX(-20deg);transition:left .7s cubic-bezier(.4,0,.2,1)}
+  .btn-vio:hover::after{left:160%}
+  .btn-sm{padding:8px 16px;font-size:14px}
+  .btn-lg{padding:14px 32px;font-size:16px;font-weight:700}
+  .btn-out{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#fff}
+  .btn-out:hover{background:rgba(255,255,255,.1)}
+  .btn-lg.btn-out{border-radius:14px}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;padding:128px 0 80px;text-align:center}
+  @media(min-width:640px){.hero{padding:160px 0 112px}}
+  .hero .glow{position:absolute;pointer-events:none;inset:0}
+  .glow .g1{position:absolute;top:-160px;left:50%;transform:translateX(-50%);width:576px;height:576px;border-radius:50%;background:rgba(255,255,255,.05);filter:blur(120px)}
+  .glow .g2{position:absolute;top:160px;left:-160px;width:384px;height:384px;border-radius:50%;background:rgba(255,255,255,.03);filter:blur(100px)}
+  .glow .g3{position:absolute;right:-160px;top:80px;width:384px;height:384px;border-radius:50%;background:rgba(255,255,255,.04);filter:blur(100px)}
+  .glow .grid{position:absolute;inset:0;opacity:.07;background-image:linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000,transparent);mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000,transparent);animation:gridpan 9s linear infinite}
+  @keyframes gridpan{from{background-position:0 0,0 0}to{background-position:56px 56px,56px 56px}}
+  @keyframes drift1{0%,100%{transform:translateX(-50%)}50%{transform:translateX(-50%) translate(40px,28px) scale(1.08)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,-32px) scale(1.1)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,40px) scale(1.05)}}
+  .glow .g1{animation:drift1 14s ease-in-out infinite}
+  .glow .g2{animation:drift2 18s ease-in-out infinite}
+  .glow .g3{animation:drift3 16s ease-in-out infinite}
+  @keyframes heroUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  .hero .plate,.hero h1,.hero .tag,.hero .desc,.hero .chips,.hero .cta,.hero .stats{animation:heroUp .8s cubic-bezier(.16,1,.3,1) both}
+  .hero h1{animation-delay:.12s}
+  .hero .tag{animation-delay:.22s}
+  .hero .desc{animation-delay:.32s}
+  .hero .chips{animation-delay:.42s}
+  .hero .cta{animation-delay:.52s}
+  .hero .stats{animation-delay:.62s}
+  .hero .inner{position:relative}
+  .plate{display:inline-flex;align-items:center;gap:12px;border-radius:16px;border:1px solid var(--border-v);background:rgba(255,255,255,.04);backdrop-filter:blur(12px);padding:10px 20px;box-shadow:0 20px 40px rgba(0,0,0,.5);margin-bottom:32px}
+  .plate .ic{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.6);flex:none}
+  .plate .tx{text-align:left;line-height:1.25}
+  .plate .tx b{display:block;font-size:16px;letter-spacing:-.02em}
+  .plate .tx span{display:block;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .plate .free{margin-left:4px;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em}
+  h1{font-size:48px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+  @media(min-width:640px){h1{font-size:72px}}
+  h1 .w{background:linear-gradient(180deg,#fff,#a1a1aa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 .v{background:linear-gradient(90deg,#fff,#a1a1aa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{margin-top:20px;font-size:20px;font-weight:600;color:#e4e4e7}
+  @media(min-width:640px){.tag{font-size:24px}}
+  .desc{margin:16px auto 0;max-width:672px;color:var(--muted);font-size:16px}
+  @media(min-width:640px){.desc{font-size:18px}}
+  .chips{margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px;font-size:14px;color:var(--muted)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--border)}
+  .chip svg{color:var(--violet-l)}
+  .chip.gr svg{color:#d4d4d8}
+  .hero .cta{margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:16px}
+  @media(min-width:640px){.hero .cta{flex-direction:row;justify-content:center}}
+  .stats{margin-top:64px;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+  .stat{border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.03);padding:20px 16px;transition:all .3s}
+  .stat:hover{transform:translateY(-3px);border-color:var(--border-v);background:rgba(255,255,255,.06)}
+  .stat b{display:block;font-size:24px;font-weight:800;background:linear-gradient(90deg,#fff,#a1a1aa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(min-width:640px){.stat b{font-size:30px}}
+  .stat span{font-size:14px;color:var(--dim)}
+
+  /* ---------- sections ---------- */
+  section.sec{padding:80px 0;position:relative}
+  @media(min-width:640px){section.sec{padding:112px 0}}
+  .sec-h{text-align:center}
+  .sec-h h2{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  @media(min-width:640px){.sec-h h2{font-size:48px}}
+  .sec-h p{margin-top:16px;color:var(--muted);font-size:18px}
+
+  .feat-grid{margin-top:48px;display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:640px){.feat-grid{grid-template-columns:repeat(2,1fr);gap:24px}}
+  @media(min-width:1024px){.feat-grid{grid-template-columns:repeat(4,1fr)}}
+  .feat{border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.03);padding:24px;transition:all .3s}
+  .feat:hover{border-color:var(--border-v);background:rgba(255,255,255,.06);transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.5)}
+  .feat .ic{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;color:var(--violet-l);transition:transform .3s}
+  .feat:hover .ic{transform:scale(1.1)}
+  .feat h3{margin-top:16px;font-size:18px;font-weight:700}
+  .feat p{margin-top:8px;font-size:14px;color:var(--muted)}
+
+  .hud-strip{margin-top:40px;border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.03);padding:24px;text-align:center}
+  .hud-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 32px;font-family:var(--mono);font-size:14px;color:#d4d4d8}
+  .hud-row span{display:inline-flex;align-items:center;gap:8px}
+  .hud-row svg{color:var(--violet-l)}
+  .hud-row .f{color:#d4d4d8}
+  .hud-efs{margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+  .ef{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:12px;font-weight:500}
+  .ef.v{color:#d4d4d8}.ef.o{color:#fdba74}.ef.a{color:#fde047}.ef.l{color:#bef264}
+  .ef.fps{font-family:var(--mono);color:#d4d4d8;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+  .ef.hp{font-family:var(--mono);color:#fca5a5;background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)}
+
+  /* ---------- modules ---------- */
+  .tabs{margin-top:48px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:576px;margin-left:auto;margin-right:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:6px}
+  .tab{padding:8px 4px;border:none;border-radius:8px;background:none;color:var(--muted);font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s}
+  @media(min-width:640px){.tab{font-size:14px;padding:10px}}
+  .tab.active{background:var(--violet);color:#000;font-weight:600}
+  .panel{display:none;margin-top:24px}
+  .panel.active{display:block}
+  .mod-box{border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.03);padding:24px}
+  @media(min-width:640px){.mod-box{padding:32px}}
+  .mods{display:flex;flex-wrap:wrap;gap:10px}
+  .mod{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.25);font-size:14px;font-weight:500;color:#e4e4e7;transition:all .2s;cursor:default}
+  .mod:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+  .mod svg{color:var(--violet-l);width:14px;height:14px}
+  .mod-note{margin-top:24px;font-size:14px;color:var(--dim)}
+
+  /* ---------- faq ---------- */
+  .faq-list{margin-top:40px;display:flex;flex-direction:column;gap:12px}
+  details{border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;transition:border-color .2s}
+  details[open]{border-color:var(--border-v);background:rgba(255,255,255,.05)}
+  summary{list-style:none;padding:20px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:20px;color:var(--muted);flex:none;transition:transform .2s}
+  details[open] summary::after{content:"–";color:#fff}
+  summary:hover{color:#fff}
+  details p{padding:0 20px 20px;color:var(--muted)}
+  @keyframes faqIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  details[open] p{animation:faqIn .28s ease}
+
+  /* ---------- download ---------- */
+  #download .box{position:relative;overflow:hidden;border-radius:24px;border:1px solid var(--border-v);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));padding:32px;text-align:center}
+  @media(min-width:640px){#download .box{padding:56px}}
+  #download .grid-bg{position:absolute;inset:0;opacity:.08;background-image:linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px);background-size:56px 56px}
+  #download .in{position:relative}
+  .free-badge{display:inline-block;margin-bottom:20px;padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.07);color:#fff;font-size:14px}
+  #download h2{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  @media(min-width:640px){#download h2{font-size:48px}}
+  #download .meta{margin-top:16px;color:var(--muted);font-size:18px}
+  #download .cta{margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:16px}
+  @media(min-width:640px){#download .cta{flex-direction:row;justify-content:center}}
+  .av-note{margin-top:32px;display:flex;gap:12px;text-align:left;max-width:672px;margin-left:auto;margin-right:auto;border-radius:12px;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.1);padding:12px 16px;font-size:14px;color:#fde68a}
+  .av-note svg{flex:none;color:var(--amber);margin-top:2px}
+
+  /* ---------- footer ---------- */
+  footer{margin-top:auto;border-top:1px solid var(--border);background:var(--bg3);padding:48px 0}
+  .ft-grid{display:grid;gap:40px;grid-template-columns:1fr}
+  @media(min-width:640px){.ft-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1024px){.ft-grid{grid-template-columns:repeat(4,1fr)}}
+  .ft-grid p{margin-top:16px;font-size:14px;color:var(--dim)}
+  .ft-grid h4{font-size:13px;font-weight:600;color:#d4d4d8;text-transform:uppercase;letter-spacing:.06em}
+  .ft-grid ul{margin-top:16px;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:14px}
+  .ft-grid a,.ft-grid button{color:var(--dim);text-decoration:none;background:none;border:none;cursor:pointer;font-family:var(--font);font-size:14px;display:inline-flex;align-items:center;gap:8px;padding:0;transition:color .2s}
+  .ft-grid a:hover,.ft-grid button:hover{color:#fff}
+  .ft-bot{margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;gap:16px;font-size:14px;color:#52525b}
+  @media(min-width:640px){.ft-bot{flex-direction:row;justify-content:space-between}}
+
+  /* ---------- back to top ---------- */
+  #backtop{position:fixed;bottom:24px;right:24px;z-index:40;width:44px;height:44px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.6);opacity:0;transform:translateY(16px);pointer-events:none;transition:all .3s;text-decoration:none}
+  #backtop.show{opacity:1;transform:none;pointer-events:auto}
+  #backtop:hover{background:#e4e4e7}
+
+  /* ---------- scroll progress ---------- */
+  #progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;pointer-events:none;background:rgba(255,255,255,.06)}
+  #progress b{display:block;height:100%;width:0;background:linear-gradient(90deg,#a1a1aa,#fff);box-shadow:0 0 10px rgba(255,255,255,.45);transition:width .12s linear}
+
+  /* ---------- dialog ---------- */
+  .ovl{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}
+  .ovl.open{display:flex}
+  .dlg{position:relative;width:100%;max-width:512px;background:var(--bg2);border:1px solid rgba(255,255,255,.15);border-radius:16px;overflow:hidden;animation:pop .25s ease;display:flex;flex-direction:column;max-height:calc(100dvh - 32px);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  @keyframes pop{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:none}}
+  .dlg .stripe{height:4px;flex:none;background:linear-gradient(90deg,#a1a1aa,#fff,#a1a1aa)}
+  .dlg .body{padding:20px;min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain}
+  @media(min-width:640px){.dlg .body{padding:24px 28px}}
+  .dlg .warn{width:44px;height:44px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);display:grid;place-items:center;color:var(--amber);margin-bottom:12px}
+  .dlg h3{font-size:20px;font-weight:800;line-height:1.3;padding-right:32px}
+  .dlg .txt{margin-top:10px;color:var(--muted);font-size:14px;line-height:1.6}
+  .dlg .file{margin-top:14px;display:inline-flex;align-items:center;gap:8px;max-width:100%;min-width:0;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);padding:8px 12px;font-family:var(--mono);font-size:11px;color:#d4d4d8;white-space:nowrap}
+  @media(min-width:640px){.dlg .file{font-size:12px}}
+  .dlg .file svg{flex:none;color:var(--muted)}
+  .dlg .file .nm{overflow:hidden;text-overflow:ellipsis}
+  .dlg ol{margin-top:18px;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:14px;color:#d4d4d8}
+  .dlg ol li{display:flex;gap:12px;align-items:flex-start}
+  .dlg ol .num{flex:none;width:20px;height:20px;margin-top:1px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);border-radius:50%;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff}
+  .dlg .note{margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:var(--muted);line-height:1.6}
+  .dlg .foot{flex:none;border-top:1px solid var(--border);background:var(--bg2);padding:16px 20px}
+  .dlg .foot .btn{padding:12px 20px;font-size:14px}
+  @media(min-width:640px){.dlg .foot{padding:20px 28px}}
+  .dlg .foot .row{display:flex;flex-direction:column-reverse;gap:10px}
+  @media(min-width:640px){.dlg .foot .row{flex-direction:row}.dlg .foot .row .btn-out{margin-right:auto}}
+  .dlg .x{position:absolute;top:12px;right:12px;z-index:2;width:32px;height:32px;border:none;border-radius:8px;background:none;color:var(--dim);display:grid;place-items:center;cursor:pointer;transition:all .2s}
+  .dlg .x:hover{background:rgba(255,255,255,.1);color:#fff}
+
+  /* ---------- toast ---------- */
+  #toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:8px;width:min(92vw,420px)}
+  .toast{background:#18181f;border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:14px 16px;box-shadow:0 20px 40px rgba(0,0,0,.6);animation:up .25s ease}
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .toast b{display:block;font-size:14px}
+  .toast span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* ---------- reveal ---------- */
+  .rv{opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="progress" aria-hidden="true"><b></b></div>
+
+<!-- ============ header ============ -->
+<header id="header">
+  <div class="wrap hd">
+    <a href="#top" class="logo">
+      <span class="ic">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M6 3.5c-.9 0-1.5.6-1.5 1.5v2.6C3.6 8.7 3.2 10 3.2 11.4c0 4.6 3.9 8.4 8.8 8.4s8.8-3.8 8.8-8.4c0-1.4-.4-2.7-1.3-3.8V5c0-.9-.6-1.5-1.5-1.5-.5 0-.9.2-1.2.5l-1.8 1.8c-.9-.3-1.9-.4-3-.4s-2.1.1-3 .4L7.2 4c-.3-.3-.7-.5-1.2-.5Z"/><circle cx="9.3" cy="12.5" r="1.4" fill="#ffffff"/><circle cx="14.7" cy="12.5" r="1.4" fill="#ffffff"/></svg>
+      </span>
+      Catlavan<b>Client</b>
+    </a>
+    <nav class="desk">
+      <a href="#features">Возможности</a>
+      <a href="#modules">Модули</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <button class="btn btn-vio btn-sm hd-dl" onclick="openDialog()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Скачать
+    </button>
+    <button class="burger" aria-label="Меню" onclick="toggleMenu(this)">
+      <svg id="m-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+  <div class="mob" id="mob-menu">
+    <a href="#features" onclick="closeMenu()">Возможности</a>
+    <a href="#modules" onclick="closeMenu()">Модули</a>
+    <a href="#faq" onclick="closeMenu()">Вопросы</a>
+    <button class="mob-dl" onclick="closeMenu();openDialog()">Скачать клиент</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ hero ============ -->
+  <section class="hero" id="top">
+    <div class="glow"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="grid"></div></div>
+    <div class="wrap inner">
+      <div class="plate">
+        <span class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M6 3.5c-.9 0-1.5.6-1.5 1.5v2.6C3.6 8.7 3.2 10 3.2 11.4c0 4.6 3.9 8.4 8.8 8.4s8.8-3.8 8.8-8.4c0-1.4-.4-2.7-1.3-3.8V5c0-.9-.6-1.5-1.5-1.5-.5 0-.9.2-1.2.5l-1.8 1.8c-.9-.3-1.9-.4-3-.4s-2.1.1-3 .4L7.2 4c-.3-.3-.7-.5-1.2-.5Z"/><circle cx="9.3" cy="12.5" r="1.4" fill="#ffffff"/><circle cx="14.7" cy="12.5" r="1.4" fill="#ffffff"/></svg>
+        </span>
+        <span class="tx"><b>Catlavan Client</b><span>Minecraft 1.16.5</span></span>
+        <span class="free">FREE</span>
+      </div>
+
+      <h1><span class="w">Catlavan</span> <span class="v">Client</span></h1>
+      <p class="tag">Играй по своим правилам</p>
+      <p class="desc">Мощный чит-клиент для Minecraft с кастомизацией визуалов, гибким HUD и бустом FPS. 80+ модулей, конфиги сообщества и косметика — всё в одном месте. Полностью бесплатная версия со всеми возможностями.</p>
+
+      <div class="chips">
+        <span class="chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Minecraft 1.16.5
+        </span>
+        <span class="chip gr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Windows 10/11 · macOS · Linux
+        </span>
+      </div>
+
+      <div class="cta">
+        <button class="btn btn-vio btn-lg" onclick="openDialog()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Скачать клиент · FREE
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b>80+</b><span>модулей внутри</span></div>
+        <div class="stat"><b>1.16.5</b><span>актуальная версия</span></div>
+        <div class="stat"><b>+250%</b><span>прирост FPS</span></div>
+        <div class="stat"><b>3</b><span>платформы</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ features ============ -->
+  <section class="sec" id="features">
+    <div class="wrap">
+      <div class="sec-h rv">
+        <h2>Возможности</h2>
+        <p>Всё, что нужно для идеальной игры</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></span><h3>Кастомизация визуалов</h3><p>Прицел, хитбоксы, частицы и цвет удара — подстрой каждую деталь под свой стиль в пару кликов.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span><h3>Гибкий HUD</h3><p>Двигай, масштабируй и закрепляй любые элементы интерфейса. Аррэйлист, кейборд, армор и эффекты — где хочешь.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0z"/></svg></span><h3>Буст FPS</h3><p>Оптимизированный рендер и умная выгрузка чанков: +150–300% к FPS даже на слабых ПК.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span><h3>80+ модулей</h3><p>Combat, Visuals, Movement, Player и Misc — всё, что нужно, уже внутри и обновляется с каждым релизом.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.735H5.81a1 1 0 0 1-.957-.735L2.02 6.02a.5.5 0 0 1 .798-.52l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></span><h3>Конфиги сообщества</h3><p>Маркет готовых конфигов: качай сеты под HvH, легит или анархию и делись своими.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><h3>Косметика и утилиты</h3><p>Плащи, крылья, анимации и полезные тулзы: AutoGG, FPS-дисплей, координаты и пинг прямо в HUD.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1 1 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span><h3>Безопасность аккаунта</h3><p>Никаких сборщиков данных и стилеров. Открытый лаунчер, никаких левых процессов в системе.</p></div>
+        <div class="feat rv"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h3>Активное сообщество</h3><p>Тысячи игроков в Discord и Telegram: конфиги, гайды, поддержка и новости обновлений 24/7.</p></div>
+      </div>
+
+      <div class="hud-strip rv">
+        <div class="hud-row">
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg> Прицел · Хитбокс · Частицы</span>
+          <span><svg class="f" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Цвет удара · Круги прыжка</span>
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> Настройка руки · Бинды</span>
+        </div>
+        <div class="hud-efs">
+          <span class="ef o">🔥 Огнестойкость</span>
+          <span class="ef a">🍖 Голод</span>
+          <span class="ef l">⬆️ Прыгучесть</span>
+          <span class="ef v">⚡ Скорость</span>
+          <span class="ef fps">FPS: 420</span>
+          <span class="ef hp">❤ 20.0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ modules ============ -->
+  <section class="sec" id="modules">
+    <div class="wrap">
+      <div class="sec-h rv">
+        <h2>Модули</h2>
+        <p>80+ модулей в пяти категориях — открой нужную</p>
+      </div>
+      <div class="rv">
+        <div class="tabs">
+          <button class="tab active" data-tab="combat">Combat</button>
+          <button class="tab" data-tab="visual">Visual</button>
+          <button class="tab" data-tab="movement">Movement</button>
+          <button class="tab" data-tab="player">Player</button>
+          <button class="tab" data-tab="misc">Misc</button>
+        </div>
+
+        <div class="panel active" id="p-combat"><div class="mod-box"><div class="mods">
+          <span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>KillAura</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Velocity</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Reach</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Criticals</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AutoTotem</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AimAssist</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>TriggerBot</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>HitBoxes</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AutoClicker</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AuraConfig</span>
+        </div><p class="mod-note">Каждый модуль настраивается отдельно: горячие клавиши, режимы работы, приватные конфиги и скрытие из аррэйлиста.</p></div></div>
+
+        <div class="panel" id="p-visual"><div class="mod-box"><div class="mods">
+          <span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>ESP</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Chams</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Fullbright</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Trajectories</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Crosshair</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>TargetHUD</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>DamageParticles</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>JumpCircles</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AttackColor</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>NoHurtCam</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>CustomSky</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>ItemPhysics</span>
+        </div><p class="mod-note">Каждый модуль настраивается отдельно: горячие клавиши, режимы работы, приватные конфиги и скрытие из аррэйлиста.</p></div></div>
+
+        <div class="panel" id="p-movement"><div class="mod-box"><div class="mods">
+          <span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Speed</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Fly</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Jesus</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>LongJump</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>NoFall</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Sprint</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Step</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>NoSlow</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>HighJump</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Spider</span>
+        </div><p class="mod-note">Каждый модуль настраивается отдельно: горячие клавиши, режимы работы, приватные конфиги и скрытие из аррэйлиста.</p></div></div>
+
+        <div class="panel" id="p-player"><div class="mod-box"><div class="mods">
+          <span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Scaffold</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Nuker</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AutoArmor</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>InvManager</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>FastPlace</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AutoFish</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>ChestSteal</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>NoRotate</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>FreeCam</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>FastEat</span>
+        </div><p class="mod-note">Каждый модуль настраивается отдельно: горячие клавиши, режимы работы, приватные конфиги и скрытие из аррэйлиста.</p></div></div>
+
+        <div class="panel" id="p-misc"><div class="mod-box"><div class="mods">
+          <span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>XRay</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AntiAFK</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Spammer</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>AutoGG</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>NameProtect</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>PacketLimiter</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>IRC Chat</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Music</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>DiscordRP</span><span class="mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>Waypoints</span>
+        </div><p class="mod-note">Каждый модуль настраивается отдельно: горячие клавиши, режимы работы, приватные конфиги и скрытие из аррэйлиста.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ faq ============ -->
+  <section class="sec" id="faq">
+    <div class="wrap" style="max-width:768px">
+      <div class="sec-h rv">
+        <h2>Частые вопросы</h2>
+        <p>Ответы на самое популярное</p>
+      </div>
+      <div class="faq-list rv">
+        <details><summary>Catlavan Client правда бесплатный?</summary><p>Да. Все 80+ модулей, кастомизация HUD, косметика и обновления доступны бесплатно. Никаких подписок и платных версий — просто скачай и играй.</p></details>
+        <details><summary>Какие версии Minecraft поддерживаются?</summary><p>Основная версия — Minecraft 1.16.5. Лаунчер сам скачает её при первом запуске: от тебя нужно только выбрать папку установки и нажать «Играть».</p></details>
+        <details><summary>На каких платформах работает клиент?</summary><p>Windows 10/11, macOS (включая Apple Silicon) и Linux. Установщик автоматически определит систему и предложит нужную сборку.</p></details>
+        <details><summary>Могу ли я получить бан за использование?</summary><p>Catlavan обходит большинство популярных античитов, но 100% защиты не существует. Не включай очевидные модули на серверах с строгими античитами и используй конфиги из раздела «легит».</p></details>
+        <details><summary>Как обновлять клиент?</summary><p>Лаунчер проверяет обновления при каждом запуске. Если вышла новая версия — достаточно нажать «Обновить», клиент докачает файлы сам, конфиги и бинды сохранятся.</p></details>
+        <details><summary>Клиент не запускается — что делать?</summary><p>Убедись, что установлена Java 17+, добавь клиента в исключения антивируса и запусти от имени администратора. Если не помогло — загляни в наш Discord, в канале #support помогут за пару минут.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ download ============ -->
+  <section class="sec" id="download">
+    <div class="wrap">
+      <div class="box rv">
+        <div class="grid-bg"></div>
+        <div class="in">
+          <span class="free-badge">FREE · без подписок и донатов</span>
+          <h2>Скачай Catlavan Client</h2>
+          <p class="meta">Версия 1.16.5 · Catlavan.rar · Java 17+ · Windows 10/11, macOS, Linux</p>
+          <div class="cta">
+            <button class="btn btn-vio btn-lg" onclick="openDialog()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Скачать клиент · FREE
+            </button>
+            <button class="btn btn-out btn-lg" onclick="showToast('Установка за 3 шага','1) Скачай и запусти установщик · 2) Дождись загрузки Minecraft 1.16.5 · 3) Зайди на сервер и открой меню на Right Shift.')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              Гайд по установке
+            </button>
+          </div>
+          <div class="av-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <p>Чит-клиент внедряет DLL-файлы в игру, поэтому антивирусы могут ложно сработать. Перед скачиванием откроется инструкция по добавлению исключений.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ footer ============ -->
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div>
+        <a href="#top" class="logo">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="#000"><path d="M6 3.5c-.9 0-1.5.6-1.5 1.5v2.6C3.6 8.7 3.2 10 3.2 11.4c0 4.6 3.9 8.4 8.8 8.4s8.8-3.8 8.8-8.4c0-1.4-.4-2.7-1.3-3.8V5c0-.9-.6-1.5-1.5-1.5-.5 0-.9.2-1.2.5l-1.8 1.8c-.9-.3-1.9-.4-3-.4s-2.1.1-3 .4L7.2 4c-.3-.3-.7-.5-1.2-.5Z"/><circle cx="9.3" cy="12.5" r="1.4" fill="#ffffff"/><circle cx="14.7" cy="12.5" r="1.4" fill="#ffffff"/></svg></span>
+          Catlavan<b>Client</b>
+        </a>
+        <p>Бесплатный чит-клиент для Minecraft 1.16.5. Играй по своим правилам.</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <ul>
+          <li><a href="#features">Возможности</a></li>
+          <li><a href="#modules">Модули</a></li>
+          <li><a href="#download">Скачать</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Поддержка</h4>
+        <ul>
+          <li><a href="#faq">Вопросы и ответы</a></li>
+          <li><a href="#download">Гайд по установке</a></li>
+          <li><a href="#faq">Сообщить о баге</a></li>
+          <li><a href="#faq">Статус серверов</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Соцсети</h4>
+        <ul>
+          <li><button onclick="openDialog()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Скачать клиент</button></li>
+          <li><a href="#top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg> Discord</a></li>
+          <li><a href="#top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg> Telegram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <p>© 2026 Catlavan Client. Бесплатная версия для всех.</p>
+      <p>Not affiliated with Mojang AB or Microsoft.</p>
+    </div>
+  </div>
+</footer>
+
+<a href="#top" id="backtop" aria-label="Наверх">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</a>
+
+<!-- ============ download dialog ============ -->
+<div class="ovl" id="ovl" role="dialog" aria-modal="true" aria-labelledby="dlg-title" onclick="if(event.target===this)closeDialog()">
+  <div class="dlg">
+    <div class="stripe"></div>
+    <div class="body">
+      <div class="warn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </div>
+      <h3 id="dlg-title">Клиент может помечаться антивирусом</h3>
+      <p class="txt">Чит-клиент внедряет DLL-файлы в процесс игры для отображения HUD и визуальных модулей. Из-за этого антивирусы могут ложно сработать и удалить файл.</p>
+      <div class="file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+        <span class="nm">Catlavan.rar · Minecraft 1.16.5</span>
+      </div>
+      <ol>
+        <li><span class="num">1</span><span>Добавьте файл Catlavan.rar и папку клиента в исключения антивируса или Защитника Windows.</span></li>
+        <li><span class="num">2</span><span>Если браузер предупреждает о файле — выберите «Сохранить».</span></li>
+        <li><span class="num">3</span><span>Если файл всё же удалился — после добавления исключения скачайте заново.</span></li>
+      </ol>
+      <p class="note">Клиент не содержит вирусов и вредоносного кода. Срабатывания антивирусов — ложные и связаны с механизмом DLL-инъекции, необходимым для работы чит-модулей.</p>
+    </div>
+    <div class="foot">
+      <div class="row">
+        <button class="btn btn-out" onclick="closeDialog()">Отмена</button>
+        <button class="btn btn-vio" onclick="confirmDownload()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Понятно, скачать
+        </button>
+      </div>
+    </div>
+    <button class="x" aria-label="Закрыть окно" onclick="closeDialog()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+  const DOWNLOAD_URL = "https://github.com/catlavandlc/Catlavan/raw/main/Catlavan.rar";
+
+  /* header scroll + back to top */
+  const header = document.getElementById("header");
+  const backtop = document.getElementById("backtop");
+  addEventListener("scroll", () => {
+    header.classList.toggle("scrolled", scrollY > 24);
+    backtop.classList.toggle("show", scrollY > 400);
+  }, { passive: true });
+
+  /* mobile menu */
+  const mob = document.getElementById("mob-menu");
+  function toggleMenu() { mob.classList.toggle("open"); }
+  function closeMenu() { mob.classList.remove("open"); }
+
+  /* tabs */
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+      t.classList.add("active");
+      document.getElementById("p-" + t.dataset.tab).classList.add("active");
+    });
+  });
+
+  /* dialog */
+  const ovl = document.getElementById("ovl");
+  function openDialog() { ovl.classList.add("open"); document.body.style.overflow = "hidden"; }
+  function closeDialog() { ovl.classList.remove("open"); document.body.style.overflow = ""; }
+  function confirmDownload() {
+    const a = document.createElement("a");
+    a.href = DOWNLOAD_URL;
+    a.download = "Catlavan.rar";
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    closeDialog();
+    showToast("Загрузка Catlavan.rar началась",
+      "Если браузер заблокировал файл — разреши сохранение и добавь клиент в исключения антивируса.");
+  }
+  addEventListener("keydown", e => { if (e.key === "Escape") closeDialog(); });
+
+  /* toast */
+  function showToast(title, desc) {
+    const wrap = document.getElementById("toasts");
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerHTML = "<b></b><span></span>";
+    t.querySelector("b").textContent = title;
+    t.querySelector("span").textContent = desc;
+    wrap.appendChild(t);
+    setTimeout(() => { t.style.transition = "opacity .3s"; t.style.opacity = "0"; setTimeout(() => t.remove(), 300); }, 4500);
+  }
+
+  /* reveal on scroll */
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }), { threshold: 0.1 });
+  document.querySelectorAll(".rv").forEach(el => io.observe(el));
+
+  /* scroll progress bar */
+  const pb = document.getElementById("progress");
+  addEventListener("scroll", () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    pb.firstElementChild.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+
+  /* count-up stats */
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const counters = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    counters.unobserve(e.target);
+    const el = e.target;
+    const m = el.textContent.trim().match(/^(\+?)(\d+)(\+?%?)$/);
+    if (!m || reduceMotion) return;
+    const target = parseInt(m[2], 10);
+    if (!isFinite(target) || target <= 0) return;
+    const t0 = performance.now(), dur = 1300;
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      el.textContent = m[1] + Math.round(target * (1 - Math.pow(1 - p, 3))) + m[3];
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }), { threshold: .6 });
+  document.querySelectorAll(".stat b").forEach(el => counters.observe(el));
+
+  /* stagger for feature cards */
+  document.querySelectorAll(".feat-grid .feat").forEach((el, i) => {
+    el.style.transitionDelay = Math.min(i * 70, 420) + "ms";
+  });
+</script>
+</body>
+</html>
